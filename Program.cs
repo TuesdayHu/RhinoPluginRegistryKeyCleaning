@@ -29,7 +29,7 @@ namespace RhinoPluginRegistryKeyCleaning
             "e0f34b71-f012-441a-9f37-18939447e90e"
         };
 
-        private static string defaultRegistryKeyUserSubName = "S-1-5-21-3208698476";
+        private static string defaultRegistryKeyUserSubName = "S-1-5-21";
 
         private static string inputPluginId;
 
@@ -74,7 +74,17 @@ namespace RhinoPluginRegistryKeyCleaning
             {
                 foreach (TargetRegistryPair trp in foundRegistryKeyList)
                 {
-                    trp.TargetRegistryKey.DeleteSubKeyTree(trp.TargetSubKeyName);
+                    if (trp.TargetRegistryKey.OpenSubKey(trp.TargetSubKeyName) != null)
+                    {
+                        if (trp.TargetRegistryKey.OpenSubKey(trp.TargetSubKeyName).SubKeyCount == 0)
+                        {
+                            trp.TargetRegistryKey.DeleteSubKey(trp.TargetSubKeyName);
+                        }
+                        else
+                        {
+                            trp.TargetRegistryKey.DeleteSubKeyTree(trp.TargetSubKeyName);
+                        }
+                    }
                     trp.TargetRegistryKey.Close();
                 }
                 Console.WriteLine("Finish");
